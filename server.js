@@ -4,8 +4,6 @@ var logger = require("morgan");
 var mongoose = require("mongoose");
 
 // Our scraping tools
-// Axios is a promised-based http library, similar to jQuery's Ajax method
-// It works on the client and on the server
 var axios = require("axios");
 var cheerio = require("cheerio");
 
@@ -29,7 +27,7 @@ app.use(express.static("public"));
 // By default mongoose uses callbacks for async queries, we're setting it to use promises (.then syntax) instead
 // Connect to the Mongo DB
 mongoose.Promise = Promise;
-mongoose.connect("mongodb://localhost/week18Populater", {
+mongoose.connect("mongodb://localhost/scrapingTest", {
   useMongoClient: true
 });
 
@@ -38,12 +36,12 @@ mongoose.connect("mongodb://localhost/week18Populater", {
 // A GET route for scraping the echojs website
 app.get("/scrape", function(req, res) {
   // First, we grab the body of the html with request
-  axios.get("http://www.echojs.com/").then(function(response) {
+  axios.get("https://news.ycombinator.com/").then(function(response) {
     // Then, we load that into cheerio and save it to $ for a shorthand selector
     var $ = cheerio.load(response.data);
 
     // Now, we grab every h2 within an article tag, and do the following:
-    $("article h2").each(function(i, element) {
+    $(".athing .title").each(function(i, element) {
       // Save an empty result object
       var result = {};
 
@@ -67,7 +65,7 @@ app.get("/scrape", function(req, res) {
         });
     });
 
-    // If we were able to successfully scrape and save an Article, send a message to the client
+    // // If we were able to successfully scrape and save an Article, send a message to the client
     res.send("Scrape Complete");
   });
 });
@@ -93,7 +91,7 @@ app.get("/articles/:id", function(req, res) {
     // ..and populate all of the notes associated with it
     .populate("note")
     .then(function(dbArticle) {
-      // If we were able to successfully find an Article with the given id, send it back to the client
+//       // If we were able to successfully find an Article with the given id, send it back to the client
       res.json(dbArticle);
     })
     .catch(function(err) {
